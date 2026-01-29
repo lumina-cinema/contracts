@@ -5,137 +5,137 @@ package auth.v1;
 import "google/protobuf/empty.proto";
 
 service AuthService {
-  /// Sends a one-time password (OTP) to the specified identifier (email/phone).
-  /// The identifier format and delivery channel are defined by `type`.
+  // Sends a one-time password (OTP) to the specified identifier (email/phone).
+  // The identifier format and delivery channel are defined by `type`.
   rpc SendOtp (SendOtpRequest) returns (SendOtpResponse);
 
-  /// Verifies the OTP provided by the user.
-  /// On success returns a new access/refresh token pair.
+  // Verifies the OTP provided by the user.
+  // On success returns a new access/refresh token pair.
   rpc VerifyOtp(VerifyOtpRequest) returns (VerifyOtpResponse);
 
-  /// Exchanges a valid refresh token for a new access/refresh token pair.
+  // Exchanges a valid refresh token for a new access/refresh token pair.
   rpc Refresh(RefreshRequest) returns (RefreshResponse);
 
-  /// Initializes Telegram login flow and returns a Telegram authorization URL.
+  // Initializes Telegram login flow and returns a Telegram authorization URL.
   rpc TelegramInit (google.protobuf.Empty) returns (TelegramInitResponse);
 
-  /// Verifies Telegram login payload (signature + auth_date) and starts/continues the flow.
-  /// Depending on the user state, may return tokens immediately or a bot deep link to complete signup.
+  // Verifies Telegram login payload (signature + auth_date) and starts/continues the flow.
+  // Depending on the user state, may return tokens immediately or a bot deep link to complete signup.
   rpc TelegramVerify (TelegramVerifyRequest) returns (TelegramVerifyResponse);
 
-  /// Completes Telegram login flow by binding a phone number to the Telegram session.
+  // Completes Telegram login flow by binding a phone number to the Telegram session.
   rpc TelegramComplete (TelegramCompleteRequest) returns (TelegramCompleteResponse);
 
-  /// Consumes a completed Telegram session and returns access/refresh tokens.
-  /// Intended to be called once per session_id.
+  // Consumes a completed Telegram session and returns access/refresh tokens.
+  // Intended to be called once per session_id.
   rpc TelegramConsume (TelegramConsumeRequest) returns (TelegramConsumeResponse);
 }
 
-/// Request to send an OTP to an identifier (email/phone).
+// Request to send an OTP to an identifier (email/phone).
 message SendOtpRequest {
-  /// Target identifier to deliver OTP to (e.g. "+31612345678" or "user@example.com").
+  // Target identifier to deliver OTP to (e.g. "+31612345678" or "user@example.com").
   string identifier = 1;
 
-  /// Identifier/delivery type. Recommended values: "phone" or "email".
+  // Identifier/delivery type. Recommended values: "phone" or "email".
   string type = 2;
 }
 
-/// Send OTP result.
+// Send OTP result.
 message SendOtpResponse {
-  /// True if the OTP was accepted for delivery (does not necessarily guarantee delivery).
+  // True if the OTP was accepted for delivery (does not necessarily guarantee delivery).
   bool ok = 1;
 }
 
-/// Request to verify an OTP for an identifier.
+// Request to verify an OTP for an identifier.
 message VerifyOtpRequest {
-  /// Identifier that received the OTP (must match the identifier used in SendOtp).
+  // Identifier that received the OTP (must match the identifier used in SendOtp).
   string identifier = 1;
 
-  /// Identifier type used for delivery. Recommended values: "phone" or "email".
+  // Identifier type used for delivery. Recommended values: "phone" or "email".
   string type = 2;
 
-  /// OTP code entered by the user.
+  // OTP code entered by the user.
   string code = 3;
 }
 
-/// Successful OTP verification response.
+// Successful OTP verification response.
 message VerifyOtpResponse {
-  /// Short-lived access token.
+  // Short-lived access token.
   string access_token = 1;
 
-  /// Long-lived refresh token used to obtain new access tokens.
+  // Long-lived refresh token used to obtain new access tokens.
   string refresh_token = 2;
 }
 
-/// Request to refresh tokens.
+// Request to refresh tokens.
 message RefreshRequest {
-  /// Refresh token previously issued by the service.
+  // Refresh token previously issued by the service.
   string refresh_token = 1;
 }
 
-/// Response containing a new token pair.
+// Response containing a new token pair.
 message RefreshResponse {
-  /// New access token.
+  // New access token.
   string access_token = 1;
 
-  /// New refresh token (may be rotated on each refresh).
+  // New refresh token (may be rotated on each refresh).
   string refresh_token = 2;
 }
 
-/// Telegram initialization response.
+// Telegram initialization response.
 message TelegramInitResponse {
-  /// Telegram OAuth authorization URL to open in the client.
+  // Telegram OAuth authorization URL to open in the client.
   string url = 1;
 }
 
-/// Telegram verification request.
+// Telegram verification request.
 message TelegramVerifyRequest {
-  /// Raw query parameters returned by Telegram (must include `hash` and `auth_date`).
-  /// The service validates signature and freshness.
+  // Raw query parameters returned by Telegram (must include `hash` and `auth_date`).
+  // The service validates signature and freshness.
   map<string, string> query = 1;
 }
 
-/// Telegram verification result.
-/// The response depends on whether the account is fully linked.
+// Telegram verification result.
+// The response depends on whether the account is fully linked.
 message TelegramVerifyResponse {
   oneof result {
-    /// Bot deep link to continue/complete the flow (e.g. provide phone, confirm consent).
+    // Bot deep link to continue/complete the flow (e.g. provide phone, confirm consent).
     string url = 1;
 
-    /// Access token issued when Telegram login can be completed immediately.
+    // Access token issued when Telegram login can be completed immediately.
     string access_token = 2;
 
-    /// Refresh token issued when Telegram login can be completed immediately.
+    // Refresh token issued when Telegram login can be completed immediately.
     string refresh_token = 3;
   }
 }
 
-/// Request to complete Telegram login by providing additional data.
+// Request to complete Telegram login by providing additional data.
 message TelegramCompleteRequest {
-  /// Telegram session identifier obtained from the bot deep link.
+  // Telegram session identifier obtained from the bot deep link.
   string session_id = 1;
 
-  /// Phone number to bind to the Telegram session (recommended E.164 format).
+  // Phone number to bind to the Telegram session (recommended E.164 format).
   string phone = 2;
 }
 
-/// Telegram completion response.
+// Telegram completion response.
 message TelegramCompleteResponse {
-  /// Session identifier that can be consumed to exchange for tokens.
+  // Session identifier that can be consumed to exchange for tokens.
   string session_id = 1;
 }
 
-/// Request to exchange a completed Telegram session for tokens.
+// Request to exchange a completed Telegram session for tokens.
 message TelegramConsumeRequest {
-  /// Session identifier from TelegramCompleteResponse.
+  // Session identifier from TelegramCompleteResponse.
   string session_id = 1;
 }
 
-/// Token pair returned after consuming a Telegram session.
+// Token pair returned after consuming a Telegram session.
 message TelegramConsumeResponse {
-  /// Access token.
+  // Access token.
   string access_token = 1;
 
-  /// Refresh token.
+  // Refresh token.
   string refresh_token = 2;
 }
