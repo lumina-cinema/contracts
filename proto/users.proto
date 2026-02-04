@@ -1,33 +1,81 @@
+// User management service and related messages.
+//
+// This file defines simple user-related RPCs used to retrieve the
+// currently authenticated user's profile, create a lightweight user
+// record, and update basic profile fields.
+
 syntax = "proto3";
 
 package users.v1;
 
+// UsersService exposes endpoints for basic user profile operations.
 service UsersService {
+  // Retrieves the profile of the current user.
   rpc GetMe (GetMeRequest) returns (GetMeResponse);
 
+  // Creates a new user record using the provided identifier.
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse);
+
+  // Partially updates user profile fields such as name and avatar.
+  rpc PatchUser (PatchUserRequest) returns (PatchUserResponse);
 }
 
+// Request to get the current user's profile.
 message GetMeRequest {
+  // The identifier of the user to fetch (typically from auth token).
   string id = 1;
 }
 
+// Response containing the requested user profile.
 message GetMeResponse {
+  // The user profile.
   User user = 1;
 }
 
+// Request to create a user record.
 message CreateUserRequest {
+  // Unique identifier for the new user (typically assigned by auth).
   string id = 1;
 }
 
+// Response for CreateUser operation.
 message CreateUserResponse {
+  // True when the user was created successfully.
   bool ok = 1;
 }
 
+// Request to update a user partially. Fields left unset are not modified.
+message PatchUserRequest {
+  // Target user id to patch.
+  string user_id = 1;
+
+  // Optional new display name for the user.
+  optional string name = 2;
+
+  // Optional new avatar URL.
+  optional string avatar = 3;
+}
+
+// Response for PatchUser operation.
+message PatchUserResponse {
+  // True when the patch operation succeeded.
+  bool ok = 1;
+}
+
+// User profile representation.
 message User {
+  // Unique user identifier.
   string          id     = 1;
+
+  // Optional display name.
   optional string name   = 2;
-  optional string phone  = 4;
+
+  // Optional email address associated with the user.
   optional string email  = 3;
+
+  // Optional phone number (E.164 recommended).
+  optional string phone  = 4;
+
+  // Optional avatar image URL.
   optional string avatar = 5;
 }

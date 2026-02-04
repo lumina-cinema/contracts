@@ -1,69 +1,126 @@
+// Account service messages and RPCs.
+//
+// This file defines APIs for retrieving account data and for performing
+// email and phone change flows which typically involve an initialization
+// step (send confirmation code) and a confirmation step (verify code).
+
 syntax = "proto3";
 
 package account.v1;
 
+// AccountService exposes methods to read account information and
+// to manage verification flows when changing email or phone.
 service AccountService {
+  // Retrieves account details by identifier.
   rpc GetAccount(GetAccountRequest) returns (GetAccountResponse);
 
+  // Starts the email change flow (sends a verification code to the new email).
   rpc InitEmailChange(InitEmailChangeRequest) returns (InitEmailChangeResponse);
+
+  // Confirms the email change using a verification code.
   rpc ConfirmEmailChange(ConfirmEmailChangeRequest) returns (ConfirmEmailChangeResponse);
 
+  // Starts the phone change flow (sends a verification code to the new phone).
   rpc InitPhoneChange(InitPhoneChangeRequest) returns (InitPhoneChangeResponse);
+
+  // Confirms the phone change using a verification code.
   rpc ConfirmPhoneChange(ConfirmPhoneChangeRequest) returns (ConfirmPhoneChangeResponse);
 }
 
+// Request to get account details for a specific user.
 message GetAccountRequest {
+  // The account's user identifier.
   string id = 1;
 }
 
+// Response containing basic account attributes and verification flags.
 message GetAccountResponse {
+  // User identifier.
   string id                = 1;
+
+  // Account phone number (if any).
   string phone             = 2;
+
+  // Account email address (if any).
   string email             = 3;
+
+  // Whether the phone number has been verified.
   bool   is_phone_verified = 4;
+
+  // Whether the email address has been verified.
   bool   is_email_verified = 5;
+
+  // Account role (e.g. USER, ADMIN).
   Role   role              = 6;
 }
 
+// Request to initialize an email change flow.
 message InitEmailChangeRequest {
+  // New email address to set.
   string email   = 1;
+
+  // User identifier for whom the change is requested.
   string user_id = 2;
 }
 
+// Response for InitEmailChange indicating whether the initialization succeeded.
 message InitEmailChangeResponse {
   bool ok = 1;
 }
 
+// Request to confirm an email change with a verification code.
 message ConfirmEmailChangeRequest {
+  // The email address being confirmed.
   string email   = 1;
+
+  // Verification code sent to the email.
   string code    = 2;
+
+  // Target user id for the email change.
   string user_id = 3;
 }
 
+// Response for ConfirmEmailChange indicating success.
 message ConfirmEmailChangeResponse {
   bool ok = 1;
 }
 
+// Request to initialize a phone change flow.
 message InitPhoneChangeRequest {
+  // New phone number to set (E.164 recommended).
   string phone   = 1;
+
+  // User identifier for whom the change is requested.
   string user_id = 2;
 }
 
+// Response for InitPhoneChange indicating whether the initialization succeeded.
 message InitPhoneChangeResponse {
   bool ok = 1;
 }
 
+// Request to confirm a phone change with a verification code.
 message ConfirmPhoneChangeRequest {
+  // The phone number being confirmed.
   string phone   = 1;
+
+  // Verification code sent to the phone.
   string code    = 2;
+
+  // Target user id for the phone change.
   string user_id = 3;
 }
 
+// Response for ConfirmPhoneChange indicating success.
 message ConfirmPhoneChangeResponse {
   bool ok = 1;
 }
 
+// Account roles enumerations.
 enum Role {
+  // Regular user account.
   USER  = 0;
+
+  // Administrator account with elevated privileges.
   ADMIN = 1;
 }
