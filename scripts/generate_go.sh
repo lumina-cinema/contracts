@@ -7,7 +7,7 @@ protoc -I ./proto \
     --go_out=./gen/go \
     --go-grpc_out=./gen/go \
     --go_opt=module=github.com/lumina-cinema/contracts \
-    --go-grpc_out=module=github.com/lumina-cinema/contracts \
+    --go-grpc_opt=module=github.com/lumina-cinema/contracts \
     ./proto/media.proto
 
 echo "Go generation complete"
