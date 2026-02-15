@@ -5,38 +5,70 @@ package media.v1;
 option go_package = 'github.com/lumina-cinema/contracts/media;media';
 option java_multiple_files = true;
 
+// MediaService provides primitive object-storage style operations for
+// binary assets (images, posters, banners, etc.).
 service MediaService {
+  // Uploads a binary payload and returns a storage key that can be used
+  // in subsequent Get/Delete operations.
   rpc Upload (UploadRequest) returns (UploadResponse);
+
+  // Retrieves raw file bytes and content type by storage key.
   rpc Get (GetRequest) returns (GetResponse);
+
+  // Deletes a file by storage key.
   rpc Delete (DeleteRequest) returns (DeleteResponse);
 }
 
+// Request to upload a media file.
 message UploadRequest {
+  // Original file name (used for metadata/auditing; not required to be unique).
   string         file_name     = 1;
+
+  // Logical folder/prefix in storage bucket (for example "movies/posters").
   string         folder        = 2;
+
+  // MIME type of uploaded payload (for example "image/jpeg").
   string         content_type  = 3;
+
+  // Raw file bytes.
   bytes          data          = 4;
+
+  // Optional target width for server-side resize operations.
   optional int32 resize_width  = 5;
+
+  // Optional target height for server-side resize operations.
   optional int32 resize_height = 6;
 }
 
+// Result of a successful upload.
 message UploadResponse {
+  // Storage key of uploaded object.
   string key = 1;
 }
 
+// Request to retrieve a stored media object.
 message GetRequest {
+  // Storage key returned by Upload.
   string key = 1;
 }
 
+// Raw media payload returned by Get.
 message GetResponse {
+  // Raw file bytes.
   bytes  data         = 1;
+
+  // MIME type of the returned payload.
   string content_type = 2;
 }
 
+// Request to delete a stored media object.
 message DeleteRequest {
+  // Storage key returned by Upload.
   string key = 1;
 }
 
+// Result of deletion operation.
 message DeleteResponse {
+  // True if object was deleted or delete was treated as successful.
   bool ok = 1;
 }

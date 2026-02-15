@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package movie.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// MovieService provides read-only access to movie catalog entities.
+// It exposes listing and detail retrieval endpoints.
+service MovieService {
+  // Returns a list of movies with optional category filter, randomization,
+  // and a hard limit on item count.
+  rpc ListMovies (ListMoviesRequest) returns (ListMoviesResponse);
+
+  // Returns a single movie by either internal id or public slug.
+  rpc GetMovie (GetMovieRequest) returns (GetMovieResponse);
+}
+
+// Request parameters for movie listing.
+message ListMoviesRequest {
+  // Optional category slug/id depending on backend implementation.
+  // Empty value means "all categories".
+  string category = 1;
+
+  // If true, backend may randomize result order (for recommendations/hero blocks).
+  bool   random   = 2;
+
+  // Maximum number of movies to return. Backend may apply an upper bound.
+  int32  limit    = 3;
+}
+
+// Response containing a list of movie cards.
+message ListMoviesResponse {
+  // Movies matching request filters.
+  repeated Movie movies = 1;
+}
+
+// Request for fetching a single movie.
+// Exactly one field in `key` should be set by the client.
+message GetMovieRequest {
+  oneof key {
+    // Internal movie identifier.
+    string id   = 1;
+
+    // Public URL slug.
+    string slug = 2;
+  }
+}
+
+// Response for GetMovie.
+message GetMovieResponse {
+    // Full movie details payload.
+    MovieDetails movie = 1;
+}
+
+// Compact movie model for listing views.
+message Movie {
+  // Internal movie identifier.
+  string                    id           = 1;
+
+  // Display title.
+  string                    title        = 2;
+
+  // URL-friendly unique slug.
+  string                    slug         = 3;
+
+  // Poster image URL/key.
+  string                    poster       = 4;
+
+  // Age rating label (for example "16+", "PG-13").
+  string                    rating_age   = 5;
+
+  // Official release date.
+  google.protobuf.Timestamp release_date = 6;
+}
+
+// Extended movie model for detail page.
+message MovieDetails {
+  // Internal movie identifier.
+  string                    id           = 1;
+
+  // Display title.
+  string                    title        = 2;
+
+  // URL-friendly unique slug.
+  string                    slug         = 3;
+
+  // Full movie description/synopsis.
+  string                    description  = 4;
+
+  // Poster image URL/key.
+  string                    poster       = 5;
+
+  // Banner/backdrop image URL/key.
+  string                    banner       = 6;
+
+  // Duration in minutes.
+  int32                     duration     = 7;
+
+  // Age rating label.
+  string                    rating_age   = 8;
+
+  // Country of production (display value).
+  string                    country      = 9;
+
+  // Official release date.
+  google.protobuf.Timestamp release_date = 10;
+}

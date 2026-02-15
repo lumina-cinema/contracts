@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package category.v1;
+import "google/protobuf/empty.proto";
+
+// CategoryService provides read operations for movie categories used by
+// catalog filtering and navigation in client applications.
+service CategoryService {
+  // Returns all categories available in the catalog.
+  // The response is expected to be used as reference data and can be cached
+  // on the client for a short period if freshness requirements allow.
+  rpc GetAllCategories (google.protobuf.Empty) returns (GetAllCategoriesResponse);
+}
+
+// Response payload for GetAllCategories.
+message GetAllCategoriesResponse {
+  // Full list of categories visible to the caller.
+  repeated Category categories = 1;
+}
+
+// Category is a lightweight domain object used for grouping movies.
+message Category {
+  // Stable category identifier (UUID/string depending on backend storage).
+  string id    = 1;
+
+  // Human-readable category title shown in UI.
+  string title = 2;
+
+  // URL-friendly unique key used in routes and query filters.
+  string slug  = 3;
+}
