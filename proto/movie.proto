@@ -67,7 +67,7 @@ message Movie {
   string                    poster       = 4;
 
   // Age rating label (for example "16+", "PG-13").
-  string                    rating_age   = 5;
+  int32                    rating_age   = 5;
 
   // Official release date.
   google.protobuf.Timestamp release_date = 6;
@@ -97,7 +97,7 @@ message MovieDetails {
   int32                     duration     = 7;
 
   // Age rating label.
-  string                    rating_age   = 8;
+  int32                    rating_age   = 8;
 
   // Country of production (display value).
   string                    country      = 9;
